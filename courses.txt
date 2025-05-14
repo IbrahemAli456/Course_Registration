@@ -1,0 +1,4 @@
+CS101,Introduction to CS,Basics of CS,3,Dr. Smith
+CS102,Advanced CS,Data Structures,3,Dr. Allen,CS101
+CS105,Networks Intro,Intro to Networking,3,Dr.Mohamed
+
