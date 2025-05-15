@@ -487,6 +487,41 @@ static void viewCoursePrerequisites() {
         }
     }
 }
+void uploadGradesFromCSV(string filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cout << "Failed to open file.\n";
+        return;
+    }
+
+    ofstream gradeFile("grades.txt", ios::app); // افتح فايل الدرجات لإضافة البيانات
+    if (!gradeFile.is_open()) {
+        cout << "Failed to open grades.txt for writing.\n";
+        return;
+    }
+
+    string line;
+    int count = 0;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string studentID, courseCode, grade;
+
+        getline(ss, studentID, ',');
+        getline(ss, courseCode, ',');
+        getline(ss, grade, ',');
+
+        // افترض إن التنسيق صح - ممكن تضيف checks
+        // سجل الدرجات في الفايل الدائم
+        gradeFile << studentID << "," << courseCode << "," << grade << "\n";
+        count++;
+    }
+
+    cout << "Grades uploaded for " << count << " entries.\n";
+
+    file.close();
+    gradeFile.close();
+}
+
 
 // ---------------------- Main Program ----------------------
 
@@ -524,13 +559,19 @@ int main() {
         if (!adminLogin(adm)) return 0;
         int ch;
         do {
-            cout << "1. Upload Course\n2. Add Student\n3. Add/Update Grade\n4. Update Prerequisites\n0. Exit\nChoice: ";
+            cout << "1. Upload Course\n2. Add Student\n3. Add/Update Grade\n4. Update Prerequisites\n5. Upload Grades from CSV\n0. Exit\nChoice: ";
             cin >> ch;
             switch (ch) {
             case 1: uploadCourse(); break;
             case 2: addStudent(); break;
             case 3: addOrUpdateGrade(); break;
             case 4: updateCoursePrerequisites(); break;
+            case 5: string csvFileName;
+                cout << "Enter CSV file name (e.g. grades.csv): ";
+                cin >> csvFileName;
+                uploadGradesFromCSV(csvFileName);
+                ; break;
+
             }
         } while (ch != 0);
     }
@@ -541,8 +582,6 @@ int main() {
 
     return 0;
 }
-
-
 
 
 
