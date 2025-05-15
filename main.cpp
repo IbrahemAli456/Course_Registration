@@ -1,6 +1,4 @@
 // CourseRegistrationSystem.cpp
-
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -9,8 +7,6 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-
-
 using namespace std;
 
 struct Course {
@@ -41,6 +37,8 @@ unordered_map<string, Student> studentsDB;
 unordered_map<string, Admin> adminsDB;
 
 // ---------------------- Utility Functions ----------------------
+
+
 static void loadCourses() {
     ifstream file("courses.txt");
     string line;
@@ -432,6 +430,64 @@ static void enterGrade() {
     cout << "Grade recorded successfully.\n";
 }
 
+
+static void updateCoursePrerequisites() {
+    string code;
+    cout << "Enter course code to update prerequisites: ";
+    cin >> code;
+
+    if (courseCatalog.find(code) == courseCatalog.end()) {
+        cout << "Course not found.\n";
+        return;
+    }
+
+    Course& course = courseCatalog[code];
+
+    cout << "Current prerequisites:\n";
+    for (const string& pre : course.prerequisites) {
+        cout << "- " << pre << endl;
+    }
+
+    cout << "Enter new prerequisite course codes (comma separated): ";
+    string preqStr;
+    cin.ignore();
+    getline(cin, preqStr);
+
+    course.prerequisites.clear();  // remove old ones
+    stringstream ss(preqStr);
+    string temp;
+    while (getline(ss, temp, ',')) {
+        if (!temp.empty())
+            course.prerequisites.push_back(temp);
+    }
+
+    saveCourses();
+    cout << "Prerequisites updated successfully.\n";
+}
+static void viewCoursePrerequisites() {
+    string code;
+    cout << "Enter course code to check prerequisites: ";
+    cin >> code;
+
+    if (courseCatalog.find(code) == courseCatalog.end()) {
+        cout << "Course not found.\n";
+        return;
+    }
+
+    const Course& course = courseCatalog[code];
+
+    cout << "Course: " << course.code << " - " << course.title << endl;
+    cout << "Prerequisites:\n";
+    if (course.prerequisites.empty()) {
+        cout << "None\n";
+    }
+    else {
+        for (const string& pre : course.prerequisites) {
+            cout << "- " << pre << endl;
+        }
+    }
+}
+
 // ---------------------- Main Program ----------------------
 
 int main() {
@@ -452,13 +508,14 @@ int main() {
         if (!studentLogin(stu)) return 0;
         int ch;
         do {
-            cout << "1. Register Course\n2. View Grades\n3. Make Report\n4. View Available Courses\n0. Exit\nChoice: ";
+            cout << "1. Register Course\n2. View Grades\n3. Make Report\n4. View Available Courses\n5. Check Course Prerequisites\n0. Exit\nChoice: ";
             cin >> ch;
             switch (ch) {
             case 1: registerCourse(*stu); break;
             case 2: viewGrades(*stu); break;
             case 3: makeReport(*stu); break;
-            case 4: viewAvailableCourses(*stu); break; 
+            case 4: viewAvailableCourses(*stu); break;
+            case 5: viewCoursePrerequisites(); break;
             }
         } while (ch != 0);
     }
@@ -467,12 +524,13 @@ int main() {
         if (!adminLogin(adm)) return 0;
         int ch;
         do {
-            cout << "1. Upload Course\n2. Add Student\n3. Add/Update Grade\n0. Exit\nChoice: ";
+            cout << "1. Upload Course\n2. Add Student\n3. Add/Update Grade\n4. Update Prerequisites\n0. Exit\nChoice: ";
             cin >> ch;
             switch (ch) {
             case 1: uploadCourse(); break;
             case 2: addStudent(); break;
             case 3: addOrUpdateGrade(); break;
+            case 4: updateCoursePrerequisites(); break;
             }
         } while (ch != 0);
     }
@@ -483,6 +541,8 @@ int main() {
 
     return 0;
 }
+
+
 
 
 
